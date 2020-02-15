@@ -28,6 +28,7 @@ class SocketServer implements MessageComponentInterface
                 $client->send($msg);
             }
         }
+
     }
 
     public function onClose(ConnectionInterface $conn)

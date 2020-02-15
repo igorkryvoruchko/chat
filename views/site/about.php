@@ -4,10 +4,10 @@
 
 use yii\helpers\Html;
 
-$this->title = 'About';
+$this->title = 'Chat';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-about">
+<div class="site-chat">
     <h1>Chat</h1>
     <div id="messages" style="border: 1px solid goldenrod"></div>
     <hr>
@@ -20,11 +20,11 @@ $this->params['breadcrumbs'][] = $this->title;
     socket.onopen = function(e) {
         alert("[open] Соединение установлено");
             $("#button").click(function(){
-                socket.send('{"idUser":"igor", "message":"'+$("#message").val()+'"}');
+                socket.send('{"idUser":<?=Yii::$app->user->getId()?>, "message":"'+$("#message").val()+'"}');
                 $("#messages").append('<p>'+$("#message").val()+'</p>');
                 $("#message").val("");
             });
-             //часть моего кода. Сюда вставлять любой валидный json.
+
     };
     socket.onmessage = function(e) {
         console.log(e.data);
@@ -32,29 +32,5 @@ $this->params['breadcrumbs'][] = $this->title;
         console.log(text);
         $("#messages").append('<p>'+text.message+'</p>');
     };
-    // let socket = new WebSocket("wss://localhost:8081");
-    //
-    // socket.onopen = function(e) {
-    //     alert("[open] Соединение установлено");
-    //     alert("Отправляем данные на сервер");
-    //     socket.send("Меня зовут Джон");
-    // };
-    //
-    // socket.onmessage = function(event) {
-    //     alert(`[message] Данные получены с сервера: ${event.data}`);
-    // };
-    //
-    // socket.onclose = function(event) {
-    //     if (event.wasClean) {
-    //         alert(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
-    //     } else {
-    //         // например, сервер убил процесс или сеть недоступна
-    //         // обычно в этом случае event.code 1006
-    //         alert('[close] Соединение прервано');
-    //     }
-    // };
-    //
-    // socket.onerror = function(error) {
-    //     alert(`[error] ${error.message}`);
-    // };
+
 </script>
