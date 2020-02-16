@@ -165,7 +165,9 @@ class SiteController extends Controller
     public function actionMessageHistory()
     {
         if ( Yii::$app->request->isAjax ) {
-            $messages = Message::find()->where(['from' => Yii::$app->request->get('from'), 'to' => Yii::$app->request->get('to')])->limit(20)->asArray()->all();
+            $messages = Message::find()->where(['from' => Yii::$app->request->get('from'), 'to' => Yii::$app->request->get('to')])
+                ->orWhere(['to' => Yii::$app->request->get('from'), 'from' => Yii::$app->request->get('to')])
+                ->limit(20)->asArray()->all();
             return json_encode($messages);
         }
         return false;
