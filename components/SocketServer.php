@@ -1,5 +1,6 @@
 <?php
 namespace app\components;
+use app\models\Message;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 class SocketServer implements MessageComponentInterface
@@ -18,6 +19,9 @@ class SocketServer implements MessageComponentInterface
 
     public function onMessage(ConnectionInterface $from, $msg)
     {
+        $message = json_decode($msg);
+        (new Message())->saveMessage($message);
+        echo var_dump($message);
         $numRecv = count($this->clients) - 1;
         echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
             , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');

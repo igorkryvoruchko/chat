@@ -2,7 +2,9 @@
 
 namespace app\controllers;
 
+use app\models\Message;
 use app\models\SignupForm;
+use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -92,6 +94,9 @@ class SiteController extends Controller
         ]);
     }
 
+    /**
+     * @return string|Response
+     */
     public function actionSignup()
     {
         $model = new SignupForm();
@@ -141,12 +146,28 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays about page.
+     * Displays chat page.
      *
      * @return string
      */
     public function actionChat()
     {
-        return $this->render('about');
+        $users = User::find()->select(['id', 'username'])->all();
+
+        return $this->render('chat',[
+            'users' => $users
+        ]);
+    }
+
+    /**
+     * @return array|bool|\yii\db\ActiveRecord[]
+     */
+    public function actionMessageHistory()
+    {
+        if ( Yii::$app->request->isAjax ) {
+            $messages = Message::find()->where(['from' => Yii::$app->request->get('from'), 'to' => Yii::$app->request->get('to')])->limit(20)->asArray()->all();
+            return json_encode($messages);
+        }
+        return false;
     }
 }
