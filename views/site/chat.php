@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div id="messages" style="border: 1px solid goldenrod"></div>
     <hr>
     <input type="text" id="message" placeholder="enter message">
-    <button id="button">Send</button>
+    <button id="button">Send message</button>
     <hr>
 </div>
 <div class="user_list">
