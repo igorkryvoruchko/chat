@@ -11,6 +11,7 @@ $(".user_item").click(function(){
         function(data, status){
             let messages = JSON.parse(data);
             console.log(messages);
+            $("#messages").empty();
             for(let i = 0; i < messages.length; i++) {
                 $("#messages").append('<p>' + messages[i].message + '</p>');
             }
