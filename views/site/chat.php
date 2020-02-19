@@ -8,6 +8,10 @@ use yii\helpers\Html;
 $this->title = 'Chat';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<div class="alert alert-danger alert_none_connection alert-dismissible" style="display: none">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+    <strong>Внимание!</strong> Соединение не установленно, проверьте подключение к сети интернет или пользуйтесь Вайбером (шутка)
+</div>
 <h1>Chat</h1>
 <div class="site_chat" id="chat_with" data-id="" style="display:none">
     <div id="messages" class="chat-page" style=""></div>
@@ -27,22 +31,5 @@ $this->params['breadcrumbs'][] = $this->title;
     </ul>
 </div>
 <script>
-
-    socket = new WebSocket('ws://localhost:8081');//помните про порт: он должен совпадать с тем, который использовался при запуске серверной части
-    socket.onopen = function(e) {
-        alert("[open] Соединение установлено");
-            $("#button").click(function(){
-                socket.send('{"userId":<?=Yii::$app->user->getId()?>,"to":'+$("#chat_with").attr("data-id")+', "message":"'+$("#message").val()+'"}');
-                $("#messages").append('<p>'+$("#message").val()+'</p>');
-                $("#message").val("");
-            });
-
-    };
-    socket.onmessage = function(e) {
-        console.log(e.data);
-        let text = JSON.parse(e.data);
-        console.log(text);
-        $("#messages").append('<p>'+text.message+'</p>');
-    };
-
+    var userId = <?=Yii::$app->user->getId()?>;
 </script>

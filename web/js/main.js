@@ -10,12 +10,29 @@ $(".user_item").click(function(){
         },
         function(data, status){
             let messages = JSON.parse(data);
-            console.log(messages);
             $("#messages").empty();
             for(let i = 0; i < messages.length; i++) {
                 $("#messages").append('<p>' + messages[i].message + '</p>');
             }
-            console.log("Data: " + data + "\nStatus: " + status);
+        });
+    let socket = new WebSocket('ws://localhost:8081');//помните про порт: он должен совпадать с тем, который использовался при запуске серверной части
+    socket.onopen = function(e) {
+        $(".alert_none_connection").css("display", "none");
+        $("#button").click(function(){
+            socket.send('{"userId"'+userId+':,"to":'+$("#chat_with").attr("data-id")+', "message":"'+$("#message").val()+'"}');
+            $("#messages").append('<p>'+$("#message").val()+'</p>');
+            $("#message").val("");
         });
 
+    };
+    socket.onmessage = function(e) {
+        console.log(e.data);
+        let text = JSON.parse(e.data);
+        console.log(text);
+        $("#messages").append('<p>'+text.message+'</p>');
+    };
+    socket.onerror = function (e) {
+        $(".alert_none_connection").css("display", "block");
+        console.log(e);
+    };
 });
