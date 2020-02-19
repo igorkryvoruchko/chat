@@ -8,14 +8,16 @@ use yii\helpers\Html;
 $this->title = 'Chat';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<h1>Chat</h1>
 <div class="site_chat" id="chat_with" data-id="" style="display:none">
-    <h1>Chat</h1>
-    <div id="messages" style="border: 1px solid goldenrod"></div>
-    <hr>
+    <div id="messages" class="chat-page" style=""></div>
+    <!-- <hr> -->
+    
     <input type="text" id="message" placeholder="enter message">
-    <button id="button">Send message</button>
+    <button id="button" class="btn btn-success btn-sm">Send</button>
     <hr>
 </div>
+
 <div class="user_list">
     <h3>Users</h3>
     <ul>
