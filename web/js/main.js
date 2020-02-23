@@ -18,8 +18,9 @@ $(".user_item").click(function(){
     let socket = new WebSocket('ws://localhost:8081');//помните про порт: он должен совпадать с тем, который использовался при запуске серверной части
     socket.onopen = function(e) {
         $(".alert_none_connection").css("display", "none");
+        socket.send('{"command": "subscribe", "channel": '+userId+'}');
         $("#button").click(function(){
-            socket.send('{"userId"'+userId+':,"to":'+$("#chat_with").attr("data-id")+', "message":"'+$("#message").val()+'"}');
+            socket.send('{"command": "message", "userId":'+userId+',"to":'+$("#chat_with").attr("data-id")+', "message":"'+$("#message").val()+'"}');
             $("#messages").append('<p>'+$("#message").val()+'</p>');
             $("#message").val("");
         });

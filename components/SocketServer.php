@@ -6,39 +6,48 @@ use Ratchet\ConnectionInterface;
 class SocketServer implements MessageComponentInterface
 {
     protected $clients;
+    private $subscriptions;
+    private $users;
+
     public function __construct()
     {
-        $this->clients = new \SplObjectStorage; // Для хранения технической информации об присоединившихся клиентах используется технология SplObjectStorage, встроенная в PHP
+        $this->clients = new \SplObjectStorage;
+        $this->subscriptions = [];
+        $this->users = [];
     }
 
     public function onOpen(ConnectionInterface $conn)
     {
         $this->clients->attach($conn);
-        echo "New connection! ({$conn->resourceId})\n";
+        $this->users[$conn->resourceId] = $conn;
     }
 
-    public function onMessage(ConnectionInterface $from, $msg)
+    public function onMessage(ConnectionInterface $conn, $msg)
     {
-        $message = json_decode($msg);
-        (new Message())->saveMessage($message);
-        echo var_dump($message);
-        $numRecv = count($this->clients) - 1;
-        echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
-            , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
-
-        foreach ($this->clients as $client) {
-            if ($from !== $client) {
-                // The sender is not the receiver, send to each client connected
-                $client->send($msg);
-            }
+        $data = json_decode($msg);
+        switch ($data->command) {
+            case "subscribe":
+                $this->subscriptions[$data->channel] = $conn->resourceId;
+                echo "sibscribe " . $conn->resourceId.": " .$data->channel."/n";
+                break;
+            case "message":
+                (new Message())->saveMessage($data);
+                if (isset($this->subscriptions[$data->to])) {
+                    $target = $this->subscriptions[$data->to];
+                    foreach ($this->clients as $client) {
+                        if ($client->resourceId == $target) {
+                            $client->send($msg);
+                        }
+                    }
+                }
         }
-
     }
 
     public function onClose(ConnectionInterface $conn)
     {
         $this->clients->detach($conn);
-        echo "Connection {$conn->resourceId} has disconnected\n";
+        unset($this->users[$conn->resourceId]);
+        unset($this->subscriptions[$conn->resourceId]);
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e)
