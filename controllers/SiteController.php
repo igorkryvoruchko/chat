@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\ImageUpload;
 use app\models\Message;
 use app\models\SignupForm;
 use app\models\User;
@@ -12,6 +13,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use yii\web\UploadedFile;
 
 class SiteController extends Controller
 {
@@ -171,5 +173,20 @@ class SiteController extends Controller
             return json_encode($messages);
         }
         return false;
+    }
+
+    public function actionSaveFile()
+    {
+        if($_FILES) {
+            $image = new ImageUpload(); // save images
+            foreach ($_FILES as $key => $value) {
+                if (UploadedFile::getInstanceByName($key)) { // сохраняем изображение
+                    $image->imageFile = UploadedFile::getInstanceByName($key);
+                    $fileName = $image->upload();
+                }
+            }
+        }
+
+        return $fileName;
     }
 }

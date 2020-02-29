@@ -7,24 +7,22 @@ class SocketServer implements MessageComponentInterface
 {
     protected $clients;
     private $subscriptions;
-    private $users;
 
     public function __construct()
     {
         $this->clients = new \SplObjectStorage;
         $this->subscriptions = [];
-        $this->users = [];
     }
 
     public function onOpen(ConnectionInterface $conn)
     {
         $this->clients->attach($conn);
-        $this->users[$conn->resourceId] = $conn;
     }
 
     public function onMessage(ConnectionInterface $conn, $msg)
     {
         $data = json_decode($msg);
+        echo var_dump($msg);
         switch ($data->command) {
             case "subscribe":
                 $this->subscriptions[$data->channel] = $conn->resourceId;
@@ -46,7 +44,6 @@ class SocketServer implements MessageComponentInterface
     public function onClose(ConnectionInterface $conn)
     {
         $this->clients->detach($conn);
-        unset($this->users[$conn->resourceId]);
         unset($this->subscriptions[$conn->resourceId]);
     }
 

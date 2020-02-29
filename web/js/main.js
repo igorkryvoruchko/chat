@@ -20,8 +20,12 @@ $(".user_item").click(function(){
         $(".alert_none_connection").css("display", "none");
         socket.send('{"command": "subscribe", "channel": '+userId+'}');
         $("#button").click(function(){
-            socket.send('{"command": "message", "userId":'+userId+',"to":'+$("#chat_with").attr("data-id")+', "message":"'+$("#message").val()+'"}');
-            $("#messages").append('<p>'+$("#message").val()+'</p>');
+            let file = '';
+            if($("#file").val().length > 1){
+                file = " <img src='/"+$('#file').val()+"'>";
+            }
+            socket.send('{"command": "message", "userId":'+userId+',"to":'+$("#chat_with").attr("data-id")+', "message":"'+$("#message").val()+file+'"}');
+            $("#messages").append('<p>'+$("#message").val()+file+'</p>');
             $("#message").val("");
         });
 
@@ -36,4 +40,23 @@ $(".user_item").click(function(){
         $(".alert_none_connection").css("display", "block");
         console.log(e);
     };
+});
+
+$('#upload').on('click', function() {
+    var file_data = $('#sortpicture').prop('files')[0];
+    var form_data = new FormData();
+    form_data.append('file', file_data);
+    $.ajax({
+        url: '/site/save-file',
+        dataType: 'text',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(php_script_response){
+            $("#file").val(php_script_response);
+            $("#button").trigger("click");
+        }
+    });
 });
