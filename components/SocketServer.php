@@ -22,7 +22,6 @@ class SocketServer implements MessageComponentInterface
     public function onMessage(ConnectionInterface $conn, $msg)
     {
         $data = json_decode($msg);
-        echo var_dump($msg);
         switch ($data->command) {
             case "subscribe":
                 $this->subscriptions[$data->channel] = $conn->resourceId;

@@ -42,7 +42,7 @@ $(".user_item").click(function(){
     };
 });
 
-$('#upload').on('click', function() {
+$('#sortpicture').on('change', function() {
     var file_data = $('#sortpicture').prop('files')[0];
     var form_data = new FormData();
     form_data.append('file', file_data);

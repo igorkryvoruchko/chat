@@ -186,7 +186,6 @@ class SiteController extends Controller
                 }
             }
         }
-
         return $fileName;
     }
 }
