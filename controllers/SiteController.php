@@ -179,13 +179,15 @@ class SiteController extends Controller
     {
         if($_FILES) {
             $image = new ImageUpload(); // save images
+            $files = [];
             foreach ($_FILES as $key => $value) {
                 if (UploadedFile::getInstanceByName($key)) { // сохраняем изображение
                     $image->imageFile = UploadedFile::getInstanceByName($key);
                     $fileName = $image->upload();
+                    array_push($files, $fileName);
                 }
             }
         }
-        return $fileName;
+        return json_encode($files);
     }
 }

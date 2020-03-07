@@ -1,4 +1,8 @@
 "use strict";
+Number.prototype.padLeft = function(base,chr){
+    var  len = (String(base || 10).length - String(this).length)+1;
+    return len > 0? new Array(len).join(chr || '0')+this : this;
+}
 $(".user_item").click(function(){
     $("#chat_with").attr("data-id", $(this).data("id"));
     $("#chat_with").css("display", "block");
@@ -12,7 +16,14 @@ $(".user_item").click(function(){
             let messages = JSON.parse(data);
             $("#messages").empty();
             for(let i = 0; i < messages.length; i++) {
-                $("#messages").append('<p>' + messages[i].message + '</p>');
+                let d = new Date(messages[i].updated_at * 1000);
+                let time = [(d.getMonth()+1).padLeft(),
+                        d.getDate().padLeft(),
+                        d.getFullYear()].join('/') +' ' +
+                    [d.getHours().padLeft(),
+                        d.getMinutes().padLeft(),
+                        d.getSeconds().padLeft()].join(':');
+                $("#messages").append('<p>' + messages[i].message + ' <span class="time">'+ time +'</span></p>');
             }
         });
     let socket = new WebSocket('ws://localhost:8081');//помните про порт: он должен совпадать с тем, который использовался при запуске серверной части
@@ -43,9 +54,11 @@ $(".user_item").click(function(){
 });
 
 $('#sortpicture').on('change', function() {
-    var file_data = $('#sortpicture').prop('files')[0];
+    var file_data = $('#sortpicture').prop('files');
     var form_data = new FormData();
-    form_data.append('file', file_data);
+    $.each( file_data, function( key, value ){
+        form_data.append( key, value );
+    });
     $.ajax({
         url: '/site/save-file',
         dataType: 'text',
@@ -55,8 +68,12 @@ $('#sortpicture').on('change', function() {
         data: form_data,
         type: 'post',
         success: function(php_script_response){
-            $("#file").val(php_script_response);
-            $("#button").trigger("click");
+            //console.log(php_script_response);
+            let images = JSON.parse(php_script_response);
+            $.each(images, function(key, value){
+                $("#file").val(value);
+                $("#button").trigger("click");
+            });
         }
     });
 });
