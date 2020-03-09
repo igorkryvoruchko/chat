@@ -15,9 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <h1>Chat</h1>
 <div class="site_chat" id="chat_with" data-id="" style="display:none">
     <div id="messages" class="chat-page" style=""></div>
-    <!-- <hr> -->
     <input id="sortpicture" type="file" multiple name="sortpic[]" />
-<!--    <button id="upload">Upload</button>-->
     <input type="text" id="message" placeholder="enter message">
     <input type="hidden" id="file">
     <button id="button" class="btn btn-success btn-sm">Send</button>

@@ -22,18 +22,31 @@ class SocketServer implements MessageComponentInterface
     public function onMessage(ConnectionInterface $conn, $msg)
     {
         $data = json_decode($msg);
+        $changeData = json_decode(json_encode($data), true);
         switch ($data->command) {
             case "subscribe":
                 $this->subscriptions[$data->channel] = $conn->resourceId;
                 echo "sibscribe " . $conn->resourceId.": " .$data->channel."/n";
                 break;
             case "message":
-                (new Message())->saveMessage($data);
+                $result = (new Message())->saveMessage($data);
+                $changeData['message_id'] = $result['message_id'];
+                $changeData['time'] = $result['time'];
+                $fullMessage = json_encode($changeData);
+                echo var_dump($changeData);
                 if (isset($this->subscriptions[$data->to])) {
                     $target = $this->subscriptions[$data->to];
                     foreach ($this->clients as $client) {
                         if ($client->resourceId == $target) {
-                            $client->send($msg);
+                            $client->send($fullMessage);
+                        }
+                    }
+                }
+                if (isset($this->subscriptions[$data->userId])) {
+                    $from = $this->subscriptions[$data->userId];
+                    foreach ($this->clients as $client) {
+                        if ($client->resourceId == $from) {
+                            $client->send($fullMessage);
                         }
                     }
                 }

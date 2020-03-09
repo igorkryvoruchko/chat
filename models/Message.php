@@ -65,5 +65,7 @@ class Message extends \yii\db\ActiveRecord
         $newMessage->to = $message->to;
         $newMessage->message = $message->message;
         $newMessage->save();
+
+        return ['message_id' => $newMessage->id, 'time' => $newMessage->updated_at];
     }
 }

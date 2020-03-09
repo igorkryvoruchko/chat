@@ -190,4 +190,13 @@ class SiteController extends Controller
         }
         return json_encode($files);
     }
+
+    public function actionDeleteMessage(){
+        if(Yii::$app->request->isAjax){
+            $message = Message::findOne(Yii::$app->request->post('id'));
+            $message->delete();
+            return $message->id;
+        }
+        return false;
+    }
 }
