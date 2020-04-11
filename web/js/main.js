@@ -20,6 +20,18 @@ socket.onopen = function(e) {
     socket.send('{"command": "subscribe", "channel": ' + userId + '}');
 };
 
+function sendMessage(){
+    let file = '';
+    if($("#file").val().length > 1){
+        file = " <img src='/"+$('#file').val()+"'>";
+    }
+    if( $("#message").val().length > 0 || $("#file").val().length > 1) {
+        socket.send('{"command": "message", "userId":' + userId + ',"to":' + $("#chat_with").attr("data-id")
+            + ', "message":"' + $("#message").val() + file + '"}');
+    }
+    $("#message").val("");
+}
+
 // SEND AND GET MESSAGES FROM WEBSOCKET
 $(".user_item").click(function(){
     $("#chat_with").attr("data-id", $(this).data("id"));
@@ -34,27 +46,17 @@ $(".user_item").click(function(){
             let messages = JSON.parse(data);
             $("#messages").empty();
             for(let i = 0; i < messages.length; i++) {
-                $("#messages").append('<p id="message_'+messages[i].id+'"><span class="message_text">' + messages[i].message + '</span> <span class="time">'+ messageTime( messages[i].updated_at ) +'</span> <span class="edit_message" data-toggle="modal" data-target="#exampleModalCenter" data-id="'+messages[i].id+'">edit</span> <span class="delete_message" data-id="'+messages[i].id+'">delete</span></p>');
+                $("#messages").append('<p id="message_'+messages[i].id+'"><span class="message_text">' +
+                    messages[i].message + '</span> <span class="time">'+ messageTime( messages[i].updated_at ) +
+                    '</span> <span class="edit_message" data-toggle="modal" data-target="#exampleModalCenter" data-id="' +
+                    messages[i].id+'">edit</span> <span class="delete_message" data-id="'+messages[i].id+'">delete</span></p>');
             }
         });
 
-        function sendMessage(){
-            let file = '';
-            if($("#file").val().length > 1){
-                file = " <img src='/"+$('#file').val()+"'>";
-            }
-            socket.send('{"command": "message", "userId":'+userId+',"to":'+$("#chat_with").attr("data-id")+', "message":"'+$("#message").val()+file+'"}');
-            $("#message").val("");
-        }
-
-        $("#button").click(function(){
-            sendMessage();
-        });
+        $("#button").click(function(){ sendMessage(); });
 
         $('#message').keydown(function(e) {
-            if(e.keyCode === 13) {
-                sendMessage();
-            }
+            if(e.keyCode === 13) { sendMessage(); }
         });
 
     socket.onmessage = function(e) {
@@ -89,9 +91,10 @@ $('#sortpicture').on('change', function() {
         type: 'post',
         success: function(php_script_response){
             let images = JSON.parse(php_script_response);
+
             $.each(images, function(key, value){
                 $("#file").val(value);
-                $("#button").trigger("click");
+                sendMessage();
                 $('#file').val("");
             });
         }
