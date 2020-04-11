@@ -29,50 +29,47 @@ $(".user_item").click(function(){
             let messages = JSON.parse(data);
             $("#messages").empty();
             for(let i = 0; i < messages.length; i++) {
-
-                $("#messages").append('<p id="message_'+messages[i].id+'">' + messages[i].message + ' <span class="time">'+ messageTime( messages[i].updated_at ) +'</span> <span class="delete_message" data-id="'+messages[i].id+'">delete</span></p>');
+                $("#messages").append('<p id="message_'+messages[i].id+'"><span class="message_text">' + messages[i].message + '</span> <span class="time">'+ messageTime( messages[i].updated_at ) +'</span> <span class="edit_message" data-toggle="modal" data-target="#exampleModalCenter" data-id="'+messages[i].id+'">edit</span> <span class="delete_message" data-id="'+messages[i].id+'">delete</span></p>');
             }
-//DELETE MESSAGE
-            $(".delete_message").click(function(){
-                if(confirm("Удалить сообщение")) {
-                    $.post("/site/delete-message",
-                        {
-                            id: $(this).attr('data-id'),
-                            _csrf: yii.getCsrfToken(),
-                        },
-                        function (data, status) {
-                            if (data) {
-                                $("#message_" + data).remove();
-                            }
-                        });
-                }
-            });
-
         });
     let socket = new WebSocket('ws://localhost:8081');//помните про порт: он должен совпадать с тем, который использовался при запуске серверной части
     socket.onopen = function(e) {
         $(".alert_none_connection").css("display", "none");
         socket.send('{"command": "subscribe", "channel": '+userId+'}');
-        $("#button").click(function(){
+
+        function sendMessage(){
             let file = '';
             if($("#file").val().length > 1){
                 file = " <img src='/"+$('#file').val()+"'>";
             }
             socket.send('{"command": "message", "userId":'+userId+',"to":'+$("#chat_with").attr("data-id")+', "message":"'+$("#message").val()+file+'"}');
             $("#message").val("");
+        }
+
+        $("#button").click(function(){
+            sendMessage();
         });
+
+        $('#message').keydown(function(e) {
+            if(e.keyCode === 13) {
+                sendMessage();
+            }
+        });
+
 
     };
     socket.onmessage = function(e) {
         console.log(e.data);
         let text = JSON.parse(e.data);
-        $("#messages").append('<p id="message_'+text.message_id+'">'+text.message+' <span>'+ messageTime(text.time) +'</span> <span class="delete_message" data-id="'+text.message_id+'">delete</span></p>');
+        $("#messages").append('<p id="message_'+text.message_id+'"><span class="message_text">'+text.message+'</span> <span class="time">'+ messageTime(text.time) +'</span> </span> <span class="edit_message" data-toggle="modal" data-target="#exampleModalCenter" data-id="'+text.message_id+'">edit</span> <span class="delete_message" data-id="'+text.message_id+'">delete</span></p>');
     };
     socket.onerror = function (e) {
         $(".alert_none_connection").css("display", "block");
         console.log(e);
     };
 });
+
+
 
 // SAVE IMAGES
 $('#sortpicture').on('change', function() {
@@ -97,6 +94,46 @@ $('#sortpicture').on('change', function() {
             });
         }
     });
+});
+
+// EDIT MESSAGE open Modal
+$("#messages").on("click", ".edit_message", function(){
+    $("#edit_input").val('');
+    $("#edit_id").val('');
+    $("#edit_input").val($(this).parent().find(".message_text").text());
+    $("#edit_id").val($(this).data('id'));
+});
+
+$("#save_updates").click(function () {
+    $.post("/site/edit-message",
+        {
+            id: $("#edit_id").val(),
+            text: $("#edit_input").val(),
+            _csrf: yii.getCsrfToken(),
+        },
+        function (data, status) {
+            if (data) {
+                let message = JSON.parse(data);
+                $("#message_"+message.id).find(".message_text").text(message.message);
+                $("#close_modal").trigger('click');
+            }
+        });
+});
+
+//DELETE MESSAGE
+$("#messages").on("click", ".delete_message", function(){
+    if(confirm("Удалить сообщение")) {
+        $.post("/site/delete-message",
+            {
+                id: $(this).attr('data-id'),
+                _csrf: yii.getCsrfToken(),
+            },
+            function (data, status) {
+                if (data) {
+                    $("#message_" + data).remove();
+                }
+            });
+    }
 });
 
 

@@ -191,6 +191,16 @@ class SiteController extends Controller
         return json_encode($files);
     }
 
+    public function actionEditMessage(){
+        if(Yii::$app->request->isAjax){
+            $message = Message::findOne(Yii::$app->request->post('id'));
+            $message->message = Yii::$app->request->post('text');
+            $message->save();
+            return json_encode(["message" => $message->message, "id" => $message->id]);
+        }
+        return false;
+    }
+
     public function actionDeleteMessage(){
         if(Yii::$app->request->isAjax){
             $message = Message::findOne(Yii::$app->request->post('id'));
