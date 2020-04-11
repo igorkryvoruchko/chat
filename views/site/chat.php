@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h3>Users</h3>
     <ul>
         <?php foreach ($users as $user){?>
-            <li class="user_item" data-self="<?=Yii::$app->user->getId()?>" data-id="<?=$user->id?>"><?=$user->username?></li>
+            <li class="user_item" id="user_<?=$user->id?>" data-self="<?=Yii::$app->user->getId()?>" data-id="<?=$user->id?>"><?=$user->username?></li>
         <?php } ?>
     </ul>
 </div>
